@@ -1,0 +1,64 @@
+{
+    "version": 2,
+    "controller": {},
+    "workers": [
+        {
+            "type": "router",
+            "realms": [
+                {
+                    "name": "realm1",
+                    "roles": [
+                        {
+                            "name": "public",
+                            "permissions": [
+                                {
+                                    "uri": "",
+                                    "match": "prefix",
+                                    "allow": {
+                                        "call": true,
+                                        "register": true,
+                                        "publish": true,
+                                        "subscribe": true
+                                    },
+                                    "disclose": {
+                                        "caller": false,
+                                        "publisher": false
+                                    },
+                                    "cache": true
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            "transports": [
+                {
+                    "type": "websocket",
+                    "endpoint": {
+                        "type": "tcp",
+                        "port": 8080
+                    },
+                    "url": "wss://toasted.d13tm.com:8081/ws",
+                    "options": {
+                       "enable_webstatus": false,
+                       "max_frame_size": 1048576,
+                       "max_message_size": 1048576,
+                       "auto_fragment_size": 65536,
+                       "fail_by_drop": true,
+                       "open_handshake_timeout": 2500,
+                       "close_handshake_timeout": 1000,
+                       "auto_ping_interval": 6000,
+                       "auto_ping_timeout": 8640000,
+                       "auto_ping_size": 4
+                    },
+                    "auth": {
+                        "anonymous" : {
+                        	"type" : "static",
+                        	"role" : "public"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

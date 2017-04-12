@@ -1,0 +1,165 @@
+<html>
+<head>
+	<script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js"></script>
+	<script type="text/javascript" src="autobahn.min.js"></script>
+	<script type="text/javascript" src="app.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
+	<link rel="stylesheet" href="app.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>Toasted!</title>
+</head>
+<body>
+	<div ng-app="ToastedApplication" class="divBody">
+		<div ng-controller="MainController">
+			<span ng-style="{'font-size' : role == 'viewer' ? '1.5em' : '1em'}">
+				<div ng-if="display != 'intro' && pointsRemaining <= 0 && display != 'black'">
+					<h1 style="text-align:center;color:#064265;">
+						<img src="toaster.svg" height="40px" />
+						<b>Toasted!</b>
+					    <span ng-if="role == 'viewer'">&middot; toasted.d13tm.com</span>
+					    <span ng-if="role =='viewer' && display == 'scoreboard'"> &middot; <b ng-click="logout();">Leaderboard</b></span>
+					</h1>
+					<div style="margin-bottom: 15px;"></div>
+				</div>
+				<div class="divPointsRemaining" ng-if="pointsRemaining > 0 && providedAnswer == null">{{pointsRemaining | number:1}}</div>
+				<br />
+	
+				<div ng-if="display == 'login'">
+					<div class="divScore">
+						<h1>Enter your team's name:</h1>
+						<p><input type="text" class="form-control" style="width: 100%;" maxlength="30" ng-model="models.loginTeamName" /></p>
+                                            <button class="btn btn-primary btn-lg  btn-block" ng-click="login()" ng-disabled="models.loginTeamName == null || models.loginTeamName.length < 3  || !checksFinished">Go!</button>
+<!--						<button class="btn btn-primary btn-lg  btn-block" ng-click="login()" ng-disabled="models.loginTeamName == null || models.loginTeamName.length < 3 || !checksFinished">Go!</button> -->
+					</div>
+				</div>
+				
+				<div ng-if="role=='viewer' && display == 'intro'">
+					<div class="divToast">
+						<img src="logo.jpg" class="imgToast" />
+					</div>
+				</div>
+			
+				<div ng-if="display != 'login'">
+					<div ng-if="role == 'player' && display != 'question' && display != 'toast'" class="divScore">
+						<h1>{{teamName}}: 
+							<span ng-if="scores[teamName] === undefined">0</span>
+							<span ng-if="scores[teamName] !== undefined">{{scores[teamName] | number:0}}</span>
+							<br />
+							<span ng-if="scores[teamName] !== undefined">Rank: {{ranks[teamName]}}</span>
+						</h1>
+					</div>
+				</div>
+				
+				<div ng-if="display == 'scoreboard'">
+					<div class="divScore" ng-if="objLength(scores) == 0">
+						<h2>We'll get Toasted soon!  No scores yet.</h2>
+					</div>
+						
+					<div class="row">			
+						<div ng-repeat="teamScore in scoresArray | orderBy:'-score'" class="col-md-6">
+					     	<div ng-if="role != 'player'" class="divScore divScoreNarrow" ng-class="{'divScoreMe': teamName == teamScore.teamName, 'divScoreLeader': $index <= 1}">
+								<div class="divScoreRank">{{ranks[teamScore.teamName]}} &nbsp;</div>
+								<div class="divScoreTeamName">{{teamScore.teamName}}</div>
+								<div class="divScoreNumber">{{teamScore.score | number:0}}</div>
+							</div>
+						<div ng-if="role == 'player'" class="divScore divScoreNarrow" ng-class="{'divScoreMe': teamName == teamScore.teamName, 'divScoreLeaderNarrow': $index <= 1}">
+                                                                <div class="divScoreRank">{{ranks[teamScore.teamName]}} &nbsp;</div>
+                                                                <div class="divScoreTeamName">{{teamScore.teamName}}</div>
+                                                                <div class="divScoreNumber">{{teamScore.score | number:0}}</div>
+                                                        </div>
+                                                </div>
+                                        </div>
+				</div>
+				
+				<div ng-if="display == 'question' || display == 'answered'">
+					<div class="divScore">
+						<h2>{{question}}</h2>
+					</div>
+				</div>
+				<div ng-if="display == 'question' && (pointsRemaining > 0 || role != 'player')">
+					<div class="divScore divAnswer" ng-repeat="answer in answers" ng-click="submitAnswer(answer);"
+					     ng-class="{'divScoreLeader': answer == correctAnswer && inTally}">
+						{{answer}}
+					</div>
+				</div>
+				<div ng-if="role == 'player' && display == 'question' && pointsRemaining <= 0">
+					<div class="divScore">
+						Time's up!  You didn't provide an answer.
+					</div>
+				</div>
+				<div ng-if="display == 'answered'">
+					<div class="divScore">
+						<h2>You answered {{providedAnswer}}<br /><br />
+						    Possible points: {{possiblePoints | number:0}}</h2>
+					</div>
+				</div>
+				
+				<div ng-if="role =='admin'" class="divAdminText">
+					<button class="btn" ng-click="playIntro();">Play/stop intro</button>
+					<button class="btn" ng-click="playOutro();">Play/stop outro</button>
+					<button class="btn" ng-click="triggerToggleBlack();">Toggle black screen and scoreboard</button>
+					<button class="btn" ng-click="playPrizeMusic();">Play/stop prize music</button>
+				</div>
+				
+				<div ng-if="role == 'admin'" class="divAdminText">
+					<div style="margin-bottom: 15px;"></div>
+					Question: <input type="text" ng-model="models.setQuestion" style="width: 100%;" class="form-control" />
+					Answers: <input type="text" ng-model="models.setAnswers" style="width: 100%;" class="form-control" />
+					Correct answer:<input type="text" ng-model="models.setCorrectAnswer" style="width: 100%;" class="form-control" />
+					Points multiplier:<input type="text" ng-model="models.setPointsMultiplier" style="width: 100%;" class="form-control" />
+					<button class="btn" ng-click="setQuestion();">Set question</button>
+					<button class="btn" ng-click="tallyAnswers();">Tally answers</button>
+					<p>&nbsp;</p>
+					Stage left team name: <input type="text" ng-model="models.setTeamLeft" style="width: 100%;" class="form-control" />
+					<button class="btn" ng-click="displayAnswer(models.setTeamLeft);">Display left answer</button>
+					<button class="btn" ng-click="displayImage(models.setTeamLeft);">Display left toast</button><br />
+					Stage right team name: <input type="text" ng-model="models.setTeamRight" style="width: 100%;" class="form-control" /><br />
+					<button class="btn" ng-click="displayAnswer(models.setTeamRight);">Display right answer</button>
+					<button class="btn" ng-click="displayImage(models.setTeamRight);">Display right toast</button>
+					<p>&nbsp;</p>
+					<div ng-if="inTally">Tallying answers; wait five seconds.</div>					
+				</div>
+				
+				<div ng-if="display == 'toast' && role != 'admin'">
+					<div class="divScore">
+						<h1>{{toastTeamName}}</h1>
+					</div>
+					<div class="divScore">
+						<h2 ng-if="toastTeamAnswer != null">Answer: {{toastTeamAnswer}}</h2>
+						<h2 ng-if="toastTeamAnswer == null">Did not answer</h2>
+					</div>
+					<div class="divScore">
+						<h2>Possible points: {{toastTeamPossiblePoints | number:0}}</h2>
+					</div>
+					<div ng-if="displayToast">
+						<div class="divToast">
+							<img src="ToastedWhiteBread.jpg" ng-if="toastTeamAnswer != null && toastTeamAnswer != toastTeamCorrectAnswer" ng-class="{'imgToast': role == 'viewer', 'imgToastWidth' : role != 'viewer'}" />
+							<img src="martini.svg" ng-if="toastTeamAnswer != null && toastTeamAnswer == toastTeamCorrectAnswer" ng-class="{'imgToast': role == 'viewer', 'imgToastWidth' : role != 'viewer'}" />
+							<img src="toast-neutral.jpg" ng-if="toastTeamAnswer == null" ng-class="{'imgToast': role == 'viewer', 'imgToastWidth' : role != 'viewer'}" />
+						</div>
+					</div>	
+				</div>
+				<br />
+				<br />
+				<div style="text-align:center;color:#064265;" ng-if="role != 'viewer'">
+					<img src="tmlogo.png" width="90px" height="75px">
+					<br /><br />
+					<p>Check D13TM online at <a href="http://www.d13tm.com/">http://www.d13tm.com/</a></p>
+					<p ng-if="display != 'login'"><a ng-click="logout();">Logout</a></p>
+					<img src="ToastedWhiteBread.jpg" width="1" height="1" />
+					<img src="martini.svg" width="1" height="1" />
+					<img src="toast-neutral.jpg" width="1" height="1" />
+					<img ng-if="display == 'viewer'" width="1" height="1" src="logo.jpg" />
+					<!-- <p>Credits for Toasted! go to Chris and Steve Sokolowski.</p> -->
+				</div>		
+				
+			</span>	
+		</div>
+	</div>
+<!-- <br>
+	<img style="border:1.5em solid #064265;" src="logo.jpg" class="img-responsive center-block"> -->
+</body>
+</html>

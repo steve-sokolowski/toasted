@@ -1,0 +1,125 @@
+body {
+	background: #F1DF74;
+	font-family: Verdana;
+	color:#FFF;
+	font-size: 1.5em;
+}
+
+.divBody {
+	padding: 15px;
+	position: relative;
+}
+
+.divScore {
+	position: relative;
+	background: #772432;
+	border: 1px dotted #000;
+	box-shadow: 1px 1px #333;
+	padding: 15px;
+	margin-bottom: 15px;
+	font-size: 1.0em;
+}
+
+.divScoreNarrow {
+	margin-bottom: 5px !important;
+	padding: 5px !important;
+}
+
+.divScoreLeader {
+	font-size: 2.4em;
+	background: #9b5e2d;
+}
+
+.divScoreLeaderNarrow {
+        font-size: 1.5em;
+        background: #9b5e2d;
+}
+
+.divScoreNumber {
+	position: absolute;
+	right: 10px;
+	top: 5%;
+	text-align: right;
+	height: 100%;
+	font-size: 1.5em;
+	vertical-align: middle;
+}
+
+.divScoreTeamName {
+	position: relative;	
+	top: 0;
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.divScoreRank {
+	position: relative;
+	display: inline-block;
+	left: 10px;
+	color: #cccccc;
+	top: 0;
+	font-size: 1.5em;
+	vertical-align: middle;
+}
+
+.divScoreRow {
+	padding-left: 15px;
+	padding-right: 15px;
+}
+
+.divPointsRemaining {
+	text-align: right;
+	position: relative;
+	width: 100%;
+	font-size: 3em;
+	padding: 5px;
+	vertical-align: middle;
+	padding-top: 0;
+	top: 0;
+	background: #9b5e2d;
+}
+
+.divAnswer {
+	cursor: pointer;
+}
+
+.divToast {
+	height: 90%;
+	width: 90%;
+	position: fixed;
+	top: 5%;
+	left: 5%
+}
+
+.imgToast {
+	text-align: center;
+	height: 100%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.imgToastWidth {
+	text-align: center;
+	width: 100%;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.divScoreMe {
+	color: #FFF;
+}
+
+.divAdminText {
+        color: #000;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active,
+.btn-primary.active {
+  color: #ffffff;
+  background-color: #064265;
+  border-color: #285e8e;
+}
